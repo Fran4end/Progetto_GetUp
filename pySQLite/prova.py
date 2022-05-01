@@ -69,15 +69,5 @@ def count(path):
     # plt.imshow(out)
     # plt.show()
 
-    per = round(((Nperson + persone) / 2), 0)
-    cv2.imshow('Output' + str(path), img)
+    per = math.floor(((Nperson + persone) / 2))
     return per
-
-
-p = count(take_photo(0))
-print(p)
-
-p = count(take_photo(1))
-print(p)
-cv2.waitKey(0)
-cv2.destroyAllWindows()

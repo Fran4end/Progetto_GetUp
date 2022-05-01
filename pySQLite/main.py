@@ -2,8 +2,9 @@
 
 # Press Maiusc+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-import os
+import json
+import GPS
+import prova
 import sqlite3
 from sqlite3 import Error
 
@@ -21,23 +22,23 @@ def create_connection(db_file):
         print(e)
     return conn
 
-def add_table(trip_file):
-    """ aggiunge tabella al database
-
-    :param trip_file: collegamento al database
-    """
-    try:
-        cur = trip_file.cursor()
-        table = """CREATE TABLE Trip(
-                        stop TEXT UNIQUE,
-                        latitude TEXT DEFAULT 0,
-                        longitude TEXT DEFAULT 0,
-                        passengers TEXT DEFAULT 0,
-                        passed TEXT DEFAULT 0
-                    );"""
-        cur.execute(table)
-    except Error as e:
-        print("Errore nella creazione della tabella")
+# def add_table(trip_file):
+#     """ aggiunge tabella al database
+#
+#     :param trip_file: collegamento al database
+#     """
+#     try:
+#         cur = trip_file.cursor()
+#         table = """CREATE TABLE Trip(
+#                         stop TEXT UNIQUE,
+#                         latitude TEXT DEFAULT 0,
+#                         longitude TEXT DEFAULT 0,
+#                         passengers TEXT DEFAULT 0,
+#                         passed TEXT DEFAULT 0
+#                     );"""
+#         cur.execute(table)
+#     except Error as e:
+#         print("Errore nella creazione della tabella")
 
 
 # SELECT * FROM stops WHERE (stop_lat BETWEEN 45.493 AND 45.494 ) AND (stop_lon BETWEEN 12.245 AND 12.246)
@@ -58,19 +59,22 @@ def select_stops_around(conn, lat, lon, delta):
     max_lon = lon+delta
     fin_sql = sql.format(min_lat=min_lat,max_lat=max_lat,min_lon=min_lon,max_lon=max_lon)
     # visuallo la query per debug
-    print(fin_sql)
     # creo un cursore
     cur = conn.cursor()
     cur.execute(fin_sql)
+
     stop = cur.fetchall()
-    # stampo i dati
-    for row in stop:
-        print(row)
-    return stop
+    stop = json.dumps(stop)
+    stop = stop.split(', ')
+    if len(stop)>1:
+        return stop[29]
+    else:
+        return None
 
 def check_position(conn, lat, lon, delta):
     """ chiama il metodo 'select_stops_around' e se il valore ritornato differisce da 'None'
-        chiama il metodo passed e ritorna true
+        chiama il metodo 'passed', 'update_passengers_at_stop', '#metodo annuncio vocale',
+        e inoltre controlla tramite il database se la corsa ha raggiunto l'ultima fermata
     :param conn: connessione al database
     :param lat: latitudine della posizione
     :param lon: longitudine della posizione
@@ -78,11 +82,14 @@ def check_position(conn, lat, lon, delta):
     :return: 'True' o 'False'
     """
     stop = select_stops_around(conn, lat, lon, delta)
-    if stop!=None:
+    if stop!=None and stop!="":
         passed(conn, stop)
-        return True
-    else:
-        return False
+        update_passengers_at_stop(conn, prova.count(prova.take_photo(0)), stop)
+        # chiamata metodo annuncio vocale fermata
+    global last_stop
+    if stop==last_stop:
+        global end_trip
+        end_trip = True
 
 def passed(conn, stop):
     """ Aggiorna la colonna 'passed' corrispondente alla fermata 'stop' nel database
@@ -105,21 +112,18 @@ def update_passengers_at_stop(conn, num, stop):
     :param stop: nome della fermata in cui è stato effettuato il rilevamento
     """
     try:
+        print(num)
         cur = conn.cursor()
-        print(stop)
-        add_passengers = """UPDATE trip SET passengers = """ +num +""" WHERE stop_name = """ +stop
+        add_passengers = """UPDATE trip SET passengers = """ +str(num) +""" WHERE stop_name = """ +stop
         cur.execute(add_passengers)
-    except Error as e:
-        print(e)
-
+        conn.commit()
     except Error as e:
         print(e)
 
 def sparticorse(conn, trip_id):
-    """
-
-    :param conn:
-    :param trip_id:
+    """ Crea la tabella contenente le informazioni relative alla corsa che sta venendo effettuata
+    :param conn: connessione al database
+    :param trip_id: codice identificativo della corsa che sta venendo effettuata
     """
     try:
         cur = conn.cursor()
@@ -135,20 +139,41 @@ def sparticorse(conn, trip_id):
         add_column = """ALTER TABLE trip
                                 ADD passed TEXT DEFAULT FALSE"""
         cur.execute(add_column)
-        table = cur.fetchall()
-        for row in table:
-            print(row)
+    except Error as e:
+        print(e)
+
+def define_last_stop(conn):
+    """ Ricava dal database il nome dell'ultima fermata della corsa che sta venendo effettuata
+        e lo assegna alla variabile 'last_stop'
+
+    :param conn: connessione al database
+    """
+    try:
+        cur = conn.cursor()
+        select_stops = """SELECT stop_name FROM trip"""
+        cur.execute(select_stops)
+        stops = cur.fetchall()
+        stops = json.dumps(stops)
+        stops = stops.replace("[", "").replace("]", "").replace('"', "")
+        stops = stops.split(", ")
+        global last_stop
+        last_stop = stops[len(stops)-1]
     except Error as e:
         print(e)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    passengers = None
+    end_trip = False
+    last_stop = ''
     db_conn = create_connection('db\\actv_aut.db')
-    sparticorse(db_conn, '5291')
+    sparticorse(db_conn, input('INSERIRE CODICE VIAGGIO'))
+    define_last_stop(db_conn)
+    while not end_trip:
+        coordinate = GPS.get_gps_position()
+        coordinate = coordinate.split(' ')
+        check_position(db_conn, coordinate[0], coordinate[1], 0.00005)
+    #check_position(db_conn, 3, 3, 0.00005)
     # select_all_stops(db_conn)
-    ciao = "Stazione Padova"
-    update_passengers_at_stop(db_conn, '4', ciao)
 
     
 
