@@ -25,7 +25,14 @@ def send_at(command,back,timeout):
 			return 0
 		else:
 			cord = rec_buff.decode().replace(back, '').replace('OK', '').replace(' ','')
-			return 1, cord
+			inputDegrees = int(cord[2:4]);
+			inputMinutes = float(cord[4:13]);
+			latitude = inputDegrees + (inputMinutes/60);
+			inputDegrees = int(cord[16:19]);
+			inputMinutes = float(cord[19:28]);
+			longitude = inputDegrees + (inputMinutes/60);
+			co = str(latitude) + ' ' + str(longitude)
+			return 1, co
 	else:
 		print('GPS is not ready')
 		return 0
