@@ -62,7 +62,6 @@ def select_stops_around(conn, lat, lon, delta):
     # creo un cursore
     cur = conn.cursor()
     cur.execute(fin_sql)
-
     stop = cur.fetchall()
     stop = json.dumps(stop)
     stop = stop.split(', ')
@@ -90,6 +89,7 @@ def check_position(conn, lat, lon, delta):
     if stop==last_stop:
         global end_trip
         end_trip = True
+        delete_table_trip(conn)
 
 def passed(conn, stop):
     """ Aggiorna la colonna 'passed' corrispondente alla fermata 'stop' nel database
@@ -101,6 +101,7 @@ def passed(conn, stop):
         cur = conn.cursor()
         change_state = """UPDATE trip SET passed = TRUE WHERE stop_name = """ + stop
         cur.execute(change_state)
+        conn.commit()
     except Error as e:
         print(e)
 
@@ -120,6 +121,15 @@ def update_passengers_at_stop(conn, num, stop):
     except Error as e:
         print(e)
 
+def delete_table_trip(conn):
+    try:
+        cur = conn.cursor()
+        delete_table = """DROP TABLE trip"""
+        cur.execute(delete_table)
+        conn.commit()
+    except Error as e:
+        print(e)
+
 def sparticorse(conn, trip_id):
     """ Crea la tabella contenente le informazioni relative alla corsa che sta venendo effettuata
     :param conn: connessione al database
@@ -127,18 +137,21 @@ def sparticorse(conn, trip_id):
     """
     try:
         cur = conn.cursor()
-        select = """CREATE TABLE trip AS SELECT * FROM routes inner join trips inner join stop_times inner join stops
+        select = """CREATE TABLE IF NOT EXISTS trip AS SELECT * FROM routes inner join trips inner join stop_times inner join stops
                         on trips.route_id = routes.route_id
                         AND stop_times.trip_id = trips.trip_id
                         AND stops.stop_id = stop_times.stop_id
                         where trips.trip_id =""" +trip_id
         cur.execute(select)
+        conn.commit()
         add_column = """ALTER TABLE trip
                                 ADD passengers TEXT DEFAULT 0"""
         cur.execute(add_column)
+        conn.commit()
         add_column = """ALTER TABLE trip
                                 ADD passed TEXT DEFAULT FALSE"""
         cur.execute(add_column)
+        conn.commit()
     except Error as e:
         print(e)
 
@@ -166,14 +179,13 @@ if __name__ == '__main__':
     end_trip = False
     last_stop = ''
     db_conn = create_connection('db\\actv_aut.db')
-    sparticorse(db_conn, input('INSERIRE CODICE VIAGGIO'))
+    sparticorse(db_conn, input('INSERIRE CODICE VIAGGIO\n')) #
     define_last_stop(db_conn)
     while not end_trip:
         coordinate = GPS.get_gps_position()
         coordinate = coordinate.split(' ')
         check_position(db_conn, coordinate[0], coordinate[1], 0.00005)
-    #check_position(db_conn, 3, 3, 0.00005)
-    # select_all_stops(db_conn)
+    #check_position(db_conn, 3, 3, 0.00005) PER PROVE IN ASSENZA DI GPS
 
     
 
