@@ -2,6 +2,7 @@
 
 # Press Maiusc+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from distutils.command.build_scripts import first_line_re
 import json
 import GPS
 import prova
@@ -84,7 +85,7 @@ def check_position(conn, lat, lon, delta):
     if stop!=None and stop!="":
         passed(conn, stop)
         update_passengers_at_stop(conn, prova.count(prova.take_photo(0)), stop)
-        # chiamata metodo annuncio vocale fermata
+        # annuncio_vocale(stop, )
     global last_stop
     if stop==last_stop:
         global end_trip
@@ -130,6 +131,21 @@ def delete_table_trip(conn):
     except Error as e:
         print(e)
 
+def column_exists(conn, name, col):
+    isExist = False
+    cur = conn.cursor()
+    try:
+        cur.execute("PRAGMA table_info(" + name + ")", None)
+        cols = cur.fetchall()
+        cols = json.dumps(cols)
+        for c in cols:
+            if (c == col):
+                isExist = True
+    except Error as e:
+        print(e)
+    finally:
+        return isExist
+
 def sparticorse(conn, trip_id):
     """ Crea la tabella contenente le informazioni relative alla corsa che sta venendo effettuata
     :param conn: connessione al database
@@ -146,16 +162,31 @@ def sparticorse(conn, trip_id):
         conn.commit()
         add_column = """ALTER TABLE trip
                                 ADD passengers TEXT DEFAULT 0"""
-        cur.execute(add_column)
+        if (column_exists(conn, 'trip', 'passengers')):
+            cur.execute(add_column)
         conn.commit()
         add_column = """ALTER TABLE trip
                                 ADD passed TEXT DEFAULT FALSE"""
-        cur.execute(add_column)
+        if (column_exists(conn, 'trip', 'passed')):
+            cur.execute(add_column)
         conn.commit()
     except Error as e:
         print(e)
 
-def define_last_stop(conn):
+def stop_list(conn):
+    try:
+        cur = conn.cursor()
+        select_stops = """SELECT stop_name FROM trip"""
+        cur.execute(select_stops)
+        stops = cur.fetchall()
+        tops = json.dumps(stops)
+        stops = stops.replace("[", "").replace("]", "").replace('"', "")
+        stops = stops.split(", ")
+        return stops
+    except Error as e:
+        print(e)
+
+def get_stop(conn, index):
     """ Ricava dal database il nome dell'ultima fermata della corsa che sta venendo effettuata
         e lo assegna alla variabile 'last_stop'
 
@@ -169,8 +200,10 @@ def define_last_stop(conn):
         stops = json.dumps(stops)
         stops = stops.replace("[", "").replace("]", "").replace('"', "")
         stops = stops.split(", ")
-        global last_stop
-        last_stop = stops[len(stops)-1]
+        if (index == 'last'):
+            return stops[len(stops)-1]
+        else:
+            return stops[index]
     except Error as e:
         print(e)
 
@@ -178,9 +211,12 @@ def define_last_stop(conn):
 if __name__ == '__main__':
     end_trip = False
     last_stop = ''
+    next_stop = ''
     db_conn = create_connection('db/actv_aut.db')
     sparticorse(db_conn, input('INSERIRE CODICE VIAGGIO\n')) #
-    define_last_stop(db_conn)
+    last_stop = get_stop(db_conn, 'last')
+    first_stop = get_stop(db_conn, 0)
+    stops = stop_list(db_conn)
     while not end_trip:
         coordinate = GPS.get_gps_position()
         print(coordinate)
