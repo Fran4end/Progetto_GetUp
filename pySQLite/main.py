@@ -178,13 +178,14 @@ def define_last_stop(conn):
 if __name__ == '__main__':
     end_trip = False
     last_stop = ''
-    db_conn = create_connection('db\\actv_aut.db')
+    db_conn = create_connection('db/actv_aut.db')
     sparticorse(db_conn, input('INSERIRE CODICE VIAGGIO\n')) #
     define_last_stop(db_conn)
     while not end_trip:
         coordinate = GPS.get_gps_position()
+        print(coordinate)
         coordinate = coordinate.split(' ')
-        check_position(db_conn, coordinate[0], coordinate[1], 0.00005)
+        check_position(db_conn, float(coordinate[0]), float(coordinate[1]), 0.00005)
     #check_position(db_conn, 3, 3, 0.00005) PER PROVE IN ASSENZA DI GPS
 
     

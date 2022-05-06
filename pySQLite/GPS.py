@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
+import RPi.GPIO as GPIO
 
 import serial
 import time
@@ -24,13 +25,15 @@ def send_at(command,back,timeout):
 			return 0
 		else:
 			cord = rec_buff.decode().replace(back, '').replace('OK', '').replace(' ','')
-			inputDegrees = int(cord[2:4]);
-			inputMinutes = float(cord[4:13]);
-			latitude = inputDegrees + (inputMinutes/60);
-			inputDegrees = int(cord[16:19]);
-			inputMinutes = float(cord[19:28]);
-			longitude = inputDegrees + (inputMinutes/60);
-			co = str(latitude) + ' ' + str(longitude)
+			co=',,,,,,'
+			if ',,,,,,' not in cord:	
+				inputDegrees = int(cord[2:4]);
+				inputMinutes = float(cord[4:13]);
+				latitude = inputDegrees + (inputMinutes/60);
+				inputDegrees = int(cord[16:19]);
+				inputMinutes = float(cord[19:28]);
+				longitude = inputDegrees + (inputMinutes/60);
+				co = str(latitude) + ' ' + str(longitude)
 			return 1, co
 	else:
 		print('GPS is not ready')
@@ -46,9 +49,14 @@ def get_gps_position():
 		answer, cord = send_at('AT+CGPSINFO','+CGPSINFO: ',1)
 		if 1 == answer:
 			answer = 0
-			return cord
+			if ',,,,,,' in cord:
+				print('GPS is not ready')
+				time.sleep(1)
+			else:
+				return cord
 		else:
 			print('error %d'%answer)
 			rec_buff = ''
 			send_at('AT+CGPS=0','OK',1)
 			return False
+		time.sleep(1.5)
