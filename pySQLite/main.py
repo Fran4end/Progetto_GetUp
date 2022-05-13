@@ -79,33 +79,35 @@ def check_position(conn, lat, lon, delta):
     """
     stop = select_stops_around(conn, lat, lon, delta)
     if stop!=None and stop!="":
-        set_next_stop(stop)
-        passed(conn, stop)#all'interno di questo metodo viene chiamato audio() per l'annuncio vocale
-        update_passengers_at_stop(conn, prova.count(prova.take_photo(0)), stop)
+        global cur_stop = stop
+        set_next_stop()
+        passed(conn, cur_stop)#all'interno di questo metodo viene chiamato audio() per l'annuncio vocale
+        update_passengers_at_stop(conn, prova.count(prova.take_photo(0)))
     global last_stop
-    if stop==last_stop:
+    if cur_stop==last_stop:
         global end_trip
         end_trip = True
         delete_table_trip(conn)
 
-def passed(conn, stop):
+def passed(conn):
     """ Aggiorna la colonna 'passed' corrispondente alla fermata 'stop' nel database
         da 'False' a 'True'
     :param conn: connessione al database
     :param stop: nome della fermata raggiunta
     """
     try:
+        global cur_stop
         cur = conn.cursor()
-        query = """SELECT passed FROM trip WHERE stop_name = """ +stop
+        query = """SELECT passed FROM trip WHERE stop_name = """ +cur_stop
         if cur.execute(query) == False:
-            audio.audio(stop, global next_stop)
-        change_state = """UPDATE trip SET passed = TRUE WHERE stop_name = """ + stop
+            audio.audio(cur_stop, global next_stop)
+        change_state = """UPDATE trip SET passed = TRUE WHERE stop_name = """ + cur_stop
         cur.execute(change_state)
         conn.commit()
     except Error as e:
         print(e)
 
-def update_passengers_at_stop(conn, num, stop):
+def update_passengers_at_stop(conn, num):
     """ Aggiorna il numero di passeggeri aggiungendolo all'interno del database, nella colonna 'passengers'
         nella riga corrispondente alla fermata
     :param conn: connessione al database
@@ -113,9 +115,10 @@ def update_passengers_at_stop(conn, num, stop):
     :param stop: nome della fermata in cui è stato effettuato il rilevamento
     """
     try:
+        global cur_stop
         print(num)
         cur = conn.cursor()
-        add_passengers = """UPDATE trip SET passengers = """ +str(num) +""" WHERE stop_name = """ +stop
+        add_passengers = """UPDATE trip SET passengers = """ +str(num) +""" WHERE stop_name = """ +cur_stop
         cur.execute(add_passengers)
         conn.commit()
     except Error as e:
@@ -187,15 +190,28 @@ def stop_list(conn):
 
 
 
-def set_next_stop(stop):
-    global next_stop, stops
-    next_stop = stops[stops.index(stop)+1]
+def set_next_stop():
+    global next_stop, stops, cur_stop
+    next_stop = stops[stops.index(cur_stop)+1]
+
+def get_info(conn):
+    try:
+        global cur_stop
+        cur = conn.cursor()
+        get_info = """SELECT route_short_name, trip_headsign, route_long_name, stop_name, stop_lat, stop_lon, passengers, passed FROM trip WHERE stop_name = """ +cur_stop
+        info = cur.fetchall
+        save_file = open("info.json", "w")
+        json.dump(info, save_file, indent = 2)
+        save_file.close()
+    except Error as e:
+        print(e)
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     end_trip = False
     last_stop = ''
+    cur_stop = ''
     next_stop = ''
     db_conn = create_connection('db/actv_aut.db')
     sparticorse(db_conn, input('INSERIRE CODICE VIAGGIO\n')) #
@@ -208,6 +224,8 @@ if __name__ == '__main__':
         print(coordinate)
         coordinate = coordinate.split(' ')
         check_position(db_conn, float(coordinate[0]), float(coordinate[1]), 0.00005)
+        get_info(db_conn)
+        
     #check_position(db_conn, 3, 3, 0.00005) PER PROVE IN ASSENZA DI GPS
 
     
