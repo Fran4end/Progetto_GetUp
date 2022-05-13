@@ -59,21 +59,16 @@ def select_stops_around(conn, lat, lon, delta):
     min_lon = lon-delta
     max_lon = lon+delta
     fin_sql = sql.format(min_lat=min_lat,max_lat=max_lat,min_lon=min_lon,max_lon=max_lon)
-    # visuallo la query per debug
+    # visualizzo la query per debug
     # creo un cursore
     cur = conn.cursor()
     cur.execute(fin_sql)
     stop = cur.fetchall()
-    stop = json.dumps(stop)
-    stop = stop.split(', ')
-    if len(stop)>1:
-        return stop[29]
-    else:
-        return None
+    return stop
 
 def check_position(conn, lat, lon, delta):
     """ chiama il metodo 'select_stops_around' e se il valore ritornato differisce da 'None'
-        chiama il metodo 'passed', 'update_passengers_at_stop', '#metodo annuncio vocale',
+        chiama il metodo 'passed', 'update_passengers_at_stop', 'audio'(questo tramite il passed),
         e inoltre controlla tramite il database se la corsa ha raggiunto l'ultima fermata
     :param conn: connessione al database
     :param lat: latitudine della posizione
@@ -83,9 +78,9 @@ def check_position(conn, lat, lon, delta):
     """
     stop = select_stops_around(conn, lat, lon, delta)
     if stop!=None and stop!="":
-        passed(conn, stop)
+        set_next_stop(stop)
+        passed(conn, stop)#all'interno di questo metodo viene chiamato audio() per l'annuncio vocale
         update_passengers_at_stop(conn, prova.count(prova.take_photo(0)), stop)
-        # annuncio_vocale(stop, )
     global last_stop
     if stop==last_stop:
         global end_trip
@@ -100,6 +95,9 @@ def passed(conn, stop):
     """
     try:
         cur = conn.cursor()
+        query = """SELECT passed FROM trip WHERE stop_name = """ +stop
+        if cur.execute(query) == False:
+            audio.audio(stop, global next_stop)
         change_state = """UPDATE trip SET passed = TRUE WHERE stop_name = """ + stop
         cur.execute(change_state)
         conn.commit()
@@ -186,26 +184,12 @@ def stop_list(conn):
     except Error as e:
         print(e)
 
-def get_stop(conn, index):
-    """ Ricava dal database il nome dell'ultima fermata della corsa che sta venendo effettuata
-        e lo assegna alla variabile 'last_stop'
 
-    :param conn: connessione al database
-    """
-    try:
-        cur = conn.cursor()
-        select_stops = """SELECT stop_name FROM trip"""
-        cur.execute(select_stops)
-        stops = cur.fetchall()
-        stops = json.dumps(stops)
-        stops = stops.replace("[", "").replace("]", "").replace('"', "")
-        stops = stops.split(", ")
-        if (index == 'last'):
-            return stops[len(stops)-1]
-        else:
-            return stops[index]
-    except Error as e:
-        print(e)
+
+def set_next_stop(stop):
+    global next_stop, stops
+    next_stop = stops[stops.index(stop)+1]
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -214,9 +198,10 @@ if __name__ == '__main__':
     next_stop = ''
     db_conn = create_connection('db/actv_aut.db')
     sparticorse(db_conn, input('INSERIRE CODICE VIAGGIO\n')) #
-    last_stop = get_stop(db_conn, 'last')
-    first_stop = get_stop(db_conn, 0)
     stops = stop_list(db_conn)
+    last_stop = stops[len(stops)-1]
+    first_stop = stops[0]
+    next_stop = stops[1]
     while not end_trip:
         coordinate = GPS.get_gps_position()
         print(coordinate)
