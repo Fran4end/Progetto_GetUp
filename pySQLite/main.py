@@ -4,9 +4,9 @@
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 from distutils.command.build_scripts import first_line_re
 import json
-import GPS
-import audio
-import prova
+#import GPS
+#import audio
+#import prova
 import sqlite3
 from sqlite3 import Error
 
@@ -98,10 +98,11 @@ def passed(conn):
     """
     try:
         global cur_stop
+        global next_stop
         cur = conn.cursor()
         query = """SELECT passed FROM trip WHERE stop_name = """ +cur_stop
         if cur.execute(query) == False:
-            audio.audio(cur_stop, global next_stop)
+            audio.audio(cur_stop, next_stop)
         change_state = """UPDATE trip SET passed = TRUE WHERE stop_name = """ + cur_stop
         cur.execute(change_state)
         conn.commit()
@@ -149,40 +150,40 @@ def column_exists(conn, name, col):
     finally:
         return isExist
 
-def sparticorse(conn, trip_id):
-    """ Crea la tabella contenente le informazioni relative alla corsa che sta venendo effettuata
-    :param conn: connessione al database
-    :param trip_id: codice identificativo della corsa che sta venendo effettuata
-    """
-    try:
-        cur = conn.cursor()
-        select = """CREATE TABLE IF NOT EXISTS trip AS SELECT * FROM routes inner join trips inner join stop_times inner join stops
-                        on trips.route_id = routes.route_id
-                        AND stop_times.trip_id = trips.trip_id
-                        AND stops.stop_id = stop_times.stop_id
-                        where trips.trip_id =""" +trip_id
-        cur.execute(select)
-        conn.commit()
-        add_column = """ALTER TABLE trip
-                                ADD passengers TEXT DEFAULT 0"""
-        if (column_exists(conn, 'trip', 'passengers')):
-            cur.execute(add_column)
-        conn.commit()
-        add_column = """ALTER TABLE trip
-                                ADD passed TEXT DEFAULT FALSE"""
-        if (column_exists(conn, 'trip', 'passed')):
-            cur.execute(add_column)
-        conn.commit()
-    except Error as e:
-        print(e)
+#def sparticorse(conn, trip_id):
+#    """ Crea la tabella contenente le informazioni relative alla corsa che sta venendo effettuata
+#    :param conn: connessione al database
+#    :param trip_id: codice identificativo della corsa che sta venendo effettuata
+#    """
+#    try:
+#        cur = conn.cursor()
+#        select = """CREATE TABLE IF NOT EXISTS trip AS SELECT * FROM routes inner join trips inner join stop_times inner join stops
+#                        on trips.route_id = routes.route_id
+#                        AND stop_times.trip_id = trips.trip_id
+#                        AND stops.stop_id = stop_times.stop_id
+#                        where trips.trip_id =""" +trip_id
+#        cur.execute(select)
+#        conn.commit()
+#        add_column = """ALTER TABLE trip
+#                                ADD passengers TEXT DEFAULT 0"""
+#        if (column_exists(conn, 'trip', 'passengers')):
+#            cur.execute(add_column)
+#        conn.commit()
+#        add_column = """ALTER TABLE trip
+#                                ADD passed TEXT DEFAULT FALSE"""
+#        if (column_exists(conn, 'trip', 'passed')):
+#            cur.execute(add_column)
+#        conn.commit()
+#    except Error as e:
+#        print(e)
 
 def stop_list(conn):
     try:
         cur = conn.cursor()
-        select_stops = """SELECT stop_name FROM trip"""
+        select_stops = """SELECT stop_name FROM esempio""" #trip-esempio
         cur.execute(select_stops)
         stops = cur.fetchall()
-        tops = json.dumps(stops)
+        stops = json.dumps(stops)
         stops = stops.replace("[", "").replace("]", "").replace('"', "")
         stops = stops.split(", ")
         return stops
@@ -199,13 +200,14 @@ def get_info(conn):
     try:
         global cur_stop
         cur = conn.cursor()
-        get_info = """SELECT route_short_name, trip_headsign, route_long_name, stop_name, stop_lat, stop_lon, passengers, passed FROM trip WHERE stop_name = """ +cur_stop
-        info = cur.fetchall
+        get_info = """SELECT (route_short_name, trip_headsign, route_long_name, stop_name, stop_lat, stop_lon, passengers, passed) FROM esempio WHERE stop_name = """ +cur_stop #trip-esempio
+        cur.execute(get_info)
+        info = cur.fetchall()
         save_file = open("info.json", "w")
         json.dump(info, save_file, indent = 2)
         save_file.close()
     except Error as e:
-        print(e)
+        print('lol')
 
 
 # Press the green button in the gutter to run the script.
@@ -215,17 +217,18 @@ if __name__ == '__main__':
     cur_stop = ''
     next_stop = ''
     db_conn = create_connection('db/actv_aut.db')
-    sparticorse(db_conn, input('INSERIRE CODICE VIAGGIO\n')) #
+    #sparticorse(db_conn, input('INSERIRE CODICE VIAGGIO\n')) #
     stops = stop_list(db_conn)
     last_stop = stops[len(stops)-1]
     first_stop = stops[0]
     next_stop = stops[1]
-    while not end_trip:
-        coordinate = GPS.get_gps_position()
-        print(coordinate)
-        coordinate = coordinate.split(' ')
-        check_position(db_conn, float(coordinate[0]), float(coordinate[1]), 0.00005)
-        get_info(db_conn)
+    get_info(db_conn)
+    #while not end_trip:
+    #    coordinate = GPS.get_gps_position()
+    #    print(coordinate)
+    #    coordinate = coordinate.split(' ')
+    #    check_position(db_conn, float(coordinate[0]), float(coordinate[1]), 0.00005)
+    #    get_info(db_conn)
         
     #check_position(db_conn, 3, 3, 0.00005) PER PROVE IN ASSENZA DI GPS
 
