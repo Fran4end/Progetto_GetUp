@@ -14,4 +14,4 @@ def decimalToSexagesimal(lat, lon):
     return out
 
 
-print(decimalToSexagesimal(12.12435, 56.567890))
+print(decimalToSexagesimal(4533.068971, 1218.784441))

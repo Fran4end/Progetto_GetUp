@@ -98,10 +98,11 @@ def passed(conn):
     """
     try:
         global cur_stop
+        global next_stop
         cur = conn.cursor()
         query = """SELECT passed FROM trip WHERE stop_name = """ +cur_stop
         if cur.execute(query) == False:
-            audio.audio(cur_stop, global next_stop)
+            audio.audio(cur_stop, next_stop)
         change_state = """UPDATE trip SET passed = TRUE WHERE stop_name = """ + cur_stop
         cur.execute(change_state)
         conn.commit()
@@ -181,8 +182,12 @@ def stop_list(conn):
         cur = conn.cursor()
         select_stops = """SELECT stop_name FROM trip"""
         cur.execute(select_stops)
-        stops = cur.fetchall()
-        tops = json.dumps(stops)
+        rows = cur.fetchall()
+        stops = []
+        for row in rows:
+            t = row[0]
+            stops.append(t)
+        stops = json.dumps(stops)
         stops = stops.replace("[", "").replace("]", "").replace('"', "")
         stops = stops.split(", ")
         return stops
@@ -199,8 +204,14 @@ def get_info(conn):
     try:
         global cur_stop
         cur = conn.cursor()
-        get_info = """SELECT route_short_name, trip_headsign, route_long_name, stop_name, stop_lat, stop_lon, passengers, passed FROM trip WHERE stop_name = """ +cur_stop
-        info = cur.fetchall
+        get_info = """SELECT route_short_name, trip_headsign, route_long_name, stop_name, stop_lat, stop_lon, passengers, passed FROM trip WHERE stop_name = """ + cur_stop
+        cur.execute(get_info)
+        rows = cur.fetchall()
+        print(rows)
+        info = []
+        for row in rows:
+            t = row[0]
+            info.append(t)
         save_file = open("info.json", "w")
         json.dump(info, save_file, indent = 2)
         save_file.close()

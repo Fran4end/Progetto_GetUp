@@ -9,12 +9,7 @@
 
     <link rel="stylesheet" href="home.css">
     <link rel="stylesheet" href="../general.css">
-    <script>
-        function getline() {
-            fetch("http://192.168.4.26:8081/")
-                .then(response => console.log(response))
-        }
-    </script>
+    <script src="home.js"></script>
 </head>
 
 <body>
@@ -28,7 +23,7 @@
 
     <main>
         <div id="search-bar">
-            <form action="http://192.168.8.250:8081" method="get">
+            <form action="http://192.168.8.250:8081/?" method="get">
                 <select name="">
                     <option value="void">Seleziona una linea</option>
                     <option value="53e">demo</option>
