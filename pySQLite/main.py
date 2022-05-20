@@ -79,7 +79,8 @@ def check_position(conn, lat, lon, delta):
     """
     stop = select_stops_around(conn, lat, lon, delta)
     if stop!=None and stop!="":
-        global cur_stop = stop
+        global cur_stop
+        cur_stop = stop
         set_next_stop()
         passed(conn, cur_stop)#all'interno di questo metodo viene chiamato audio() per l'annuncio vocale
         update_passengers_at_stop(conn, prova.count(prova.take_photo(0)))
