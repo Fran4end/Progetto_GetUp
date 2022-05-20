@@ -1,5 +1,6 @@
 const express = require('express');
 const cors= require('cors');
+const fs = require('fs');
 
 const app = express();
 
@@ -15,5 +16,7 @@ app.listen(port, function(err){
 })
 
 app.get('/?', function(__req, res){
-	res.end("ciao")
+	var file = fs.readFileSync('/home/pi/Desktop/Progetto_GetUp/pySQLite/info.json');
+	var data = JSON.parse(file);
+	res.end(data)
 })
