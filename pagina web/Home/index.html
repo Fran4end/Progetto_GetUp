@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progetto GetUp</title>
+
+    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="../general.css">
+    <script src="home.js"></script>
+</head>
+
+<body>
+    <header>
+        <ul>
+            <li>Nome App</li>
+            <li><a href="">About</a></li>
+            <li><a href="">Servizi</a></li>
+        </ul>
+    </header>
+
+    <main>
+        <div id="search-bar">
+            <form action="http://192.168.8.250:8081/?" method="get">
+                <select name="">
+                    <option value="void">Seleziona una linea</option>
+                    <option value="53e">demo</option>
+                </select>
+                <input type="button" onclick="getline()">
+            </form>
+        </div>
+
+        <div id="carousel">
+            <div>
+                <p>Conosci la posizione del mezzo in tempo reale</p>
+                <img src="image/location.svg" alt="immagine illustrativa">
+            </div>
+            <div>
+                <p>Conosci la capienza effettiva del mezzo</p>
+                <img src="image/capacity.svg" alt="immagine illustrativa">
+            </div>
+            <div>
+                <p>Scopri se il tuo bus è già passato</p>
+                <img src="image/bus-stop.svg" alt="immagine illustrativa">
+            </div>
+        </div>
+    </main>
+
+    <footer>
+
+    </footer>
+</body>
+
+</html>

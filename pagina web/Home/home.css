@@ -1,0 +1,179 @@
+header ul{
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+header ul *{
+    color: var(--black);
+    font-weight: 500;
+    font-size: 18px;
+}
+
+header ul li{
+    display: inline;
+}
+
+header a{
+    text-decoration: none;
+}
+
+main #search-bar{
+    background-size: cover;
+}
+
+@media screen and (max-width: 750px){
+    header{
+        padding: 25px 0;
+    }
+
+    header ul{
+        display: flex;
+        justify-content: space-around;
+    }
+
+    main #search-bar{
+        width: 100%;
+        height: 200px;
+    }
+
+    main #search-bar{
+        background-image: url(image/img1-large.jpg);
+        position: absolute; 
+        top: 0;
+        width: 100%;
+        height: 500px;
+        z-index: -1;
+    }
+
+    main #search-bar select{
+        position: absolute; 
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        outline: none;
+        width: 45%;
+        min-width: 200px; 
+        padding: 8px 10px;
+        border: none;
+        background-color: var(--white);
+        border-radius: 10px;
+        font-size: 16px;
+    }
+
+    main #search-bar input{
+        position: absolute; 
+        top: calc(50% + 45px);
+        background-color: var(--first-color);
+        color: var(--white);
+        border: none;
+        font-size: 16px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        width: 18%;
+        min-width: 80px; 
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    main #carousel{
+        position: absolute;
+        top: 500px;
+        padding: 50px 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+
+    main #carousel div{
+        width: 40%;
+        margin: 0 30%; 
+        margin-bottom: 30px;
+        margin-top: 30px;
+        border-radius: 10px;
+        padding: 15px 15px;
+        text-align: center;
+        box-shadow: 0px 0px 15px 10px rgba(228, 228, 228, 0.822);
+    }
+
+    main #carousel div img{
+        margin-top: 30px;
+        width: 150px;
+    }
+}
+
+@media screen and (min-width: 750px){
+    header{
+        padding: 25px 50px;
+    }
+
+    header ul li{
+        margin-right: 60px;
+    }
+    
+    header a{
+        padding: 5px 10px;
+    }
+
+    main #search-bar{
+        background-image: url(image/img1-large.jpg);
+        position: absolute; 
+        top: 0;
+        width: 100%;
+        height: 500px;
+        z-index: -1;
+    }
+
+    main #search-bar select{
+        position: absolute; 
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        outline: none;
+        width: 20%;
+        min-width: 200px; 
+        padding: 8px 10px;
+        border: none;
+        background-color: var(--white);
+        border-radius: 10px;
+        font-size: 16px;
+    }
+
+    main #search-bar input{
+        position: absolute; 
+        top: calc(50% + 45px);
+        background-color: var(--first-color);
+        color: var(--white);
+        border: none;
+        font-size: 16px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        width: 8%;
+        min-width: 80px; 
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    main #carousel{
+        position: absolute;
+        top: 500px;
+        padding: 50px 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+    }
+
+    main #carousel div{
+        width: 15%;
+        border-radius: 10px;
+        padding: 15px 15px;
+        text-align: center;
+        box-shadow: 0px 0px 15px 10px rgba(228, 228, 228, 0.822);
+    }
+
+    main #carousel div img{
+        margin-top: 30px;
+        width: 150px;
+    }
+}
