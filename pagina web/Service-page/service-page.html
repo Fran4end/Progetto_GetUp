@@ -1,4 +1,55 @@
 <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Demo: Add custom markers in Mapbox GL JS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.css" rel="stylesheet" />
+    <script src="service-page.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .marker {
+            background-image: url('mapbox-icon.png');
+            background-size: cover;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .mapboxgl-popup {
+            max-width: 200px;
+        }
+
+        .mapboxgl-popup-content {
+            text-align: center;
+            font-family: 'Open Sans', sans-serif;
+        }
+    </style>
+</head>
+
+<body onload="update()">
+    <div id="map"></div>
+</body>
+
+</html>
+
+
+<!-- <!DOCTYPE html>
 <html lang="it">
 
 <head>
@@ -9,14 +60,15 @@
 
     <link rel="stylesheet" href="service-page.css">
     <link rel="stylesheet" href="../general.css">
+
     <script src="service-page.js"></script>
 </head>
 
 <body onload="upDate()">
     <div class="mapouter">
-        <div class="gmap_canvas"><iframe
-                src="https://maps.google.com/maps?q=45.495049%2012.257290&amp;t=&amp;z=13&amp;ie=UTF8&amp;iwloc=&amp;output=embed"
-                id="gmap_canvas" frameborder="0" scrolling="no" style="width: 100%; height: 100vh;"></iframe>
+        <div class="gmap_canvas"><iframe style="height: 100vh;
+            width: 100%;" loading="lazy" allowfullscreen
+                src="https://www.google.com/maps/embed/v1/search?q=45.55123775%2012.31307835&key=AIzaSyBwlNQjJ16ua9z5rQ4jnQiF2eMDBpbPq3Q"></iframe>
             <style>
                 .mapouter {
                     position: relative;
@@ -37,4 +89,4 @@
     </div>
 </body>
 
-</html>
+</html> -->
