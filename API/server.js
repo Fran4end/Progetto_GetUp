@@ -1,6 +1,5 @@
 const express = require('express');
 const cors= require('cors');
-const fs = require('fs');
 
 const app = express();
 
@@ -15,8 +14,10 @@ app.listen(port, function(err){
 	}
 })
 
-app.get('/?', function(__req, res){
-	var file = fs.readFileSync('/home/pi/Desktop/Progetto_GetUp/pySQLite/info.json');
-	var data = JSON.parse(file);
-	res.end(data)
+app.get('/position', function(__req, res){
+	var latitudine = 1;
+	var longitudine = 1;
+	var data = JSON.stringify({'latitudine': latitudine, 'longitudine' : longitudine});
+	res.send(data);
+	res.end();
 })
