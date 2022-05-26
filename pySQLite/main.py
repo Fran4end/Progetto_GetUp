@@ -219,7 +219,7 @@ if __name__ == '__main__':
     db_conn = create_connection('db/actv_aut.db')
     #lolsparticorse(db_conn, input('INSERIRE CODICE VIAGGIO\n')) #
     stops = stop_list(db_conn)
-    last_stop = stops[len(stops)-1
+    last_stop = stops[len(stops)-1]
     first_stop = stops[0]
     next_stop = stops[1]
     get_info(db_conn)
