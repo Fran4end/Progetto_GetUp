@@ -49,7 +49,7 @@ def get_gps_position():
 		answer, cord = send_at('AT+CGPSINFO','+CGPSINFO: ',1)
 		if 1 == answer:
 			answer = 0
-			if ',,,,,,' in cord:
+			if ',,' or '\r\n' in cord:
 				print('GPS is not ready')
 				time.sleep(1)
 			else:
@@ -60,3 +60,5 @@ def get_gps_position():
 			send_at('AT+CGPS=0','OK',1)
 			return False
 		time.sleep(1.5)
+
+print(get_gps_position())
