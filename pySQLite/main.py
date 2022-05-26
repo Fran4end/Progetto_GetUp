@@ -4,9 +4,9 @@
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 #from distutils.command.build_scripts import first_line_re
 import json
-#lolimport GPS
-#lolimport audio
-#import prova
+import GPS
+import audio
+import prova
 import sqlite3
 from sqlite3 import Error
 
@@ -54,7 +54,7 @@ def select_stops_around(conn, lat, lon, delta):
     :return: stringa contenente il nome della fermata corrispondente alle coordinate
     """
     # query sq per a ricerca geografica di una fermata
-    sql = "SELECT * FROM trip WHERE (stop_lat BETWEEN {min_lat:.4f} AND {max_lat:.4f} ) AND (stop_lon BETWEEN {min_lon:.4f} AND {max_lon:.4f})" #loltrip-esempio
+    sql = "SELECT * FROM esempio WHERE (stop_lat BETWEEN {min_lat:.4f} AND {max_lat:.4f} ) AND (stop_lon BETWEEN {min_lon:.4f} AND {max_lon:.4f})" #loltrip-esempio
     min_lat = lat-delta
     max_lat = lat+delta
     min_lon = lon-delta
@@ -83,7 +83,7 @@ def check_position(conn, lat, lon, delta):
         cur_stop = stop
         set_next_stop()
         passed(conn, cur_stop)#all'interno di questo metodo viene chiamato audio() per l'annuncio vocale
-        #lolupdate_passengers_at_stop(conn, prova.count(prova.take_photo(0)))
+        update_passengers_at_stop(conn, prova.count(prova.take_photo(0)))
     global last_stop
     if cur_stop==last_stop:
         global end_trip
@@ -100,10 +100,10 @@ def passed(conn):
         global cur_stop
         global next_stop
         cur = conn.cursor()
-        query = """SELECT passed FROM trip WHERE stop_name = """ + cur_stop #loltrip-esempio
-        #lolif cur.execute(query) == False:
-            #lolaudio.audio(cur_stop, next_stop)
-        change_state = """UPDATE trip SET passed = TRUE WHERE stop_name = """ + cur_stop #loltrip-esempio
+        query = """SELECT passed FROM esempio WHERE stop_name = """ + cur_stop #loltrip-esempio
+        if cur.execute(query) == False:
+            audio.audio(cur_stop, next_stop)
+        change_state = """UPDATE esempio SET passed = TRUE WHERE stop_name = """ + cur_stop #loltrip-esempio
         cur.execute(change_state)
         conn.commit()
     except Error as e:
@@ -120,7 +120,7 @@ def update_passengers_at_stop(conn, num):
         global cur_stop
         print(num)
         cur = conn.cursor()
-        add_passengers = """UPDATE trip SET passengers = """ +str(num) +""" WHERE stop_name = """ +cur_stop #loltrip-esempio
+        add_passengers = """UPDATE esempio SET passengers = """ +str(num) +""" WHERE stop_name = """ +cur_stop #loltrip-esempio
         cur.execute(add_passengers)
         conn.commit()
     except Error as e:
@@ -129,7 +129,7 @@ def update_passengers_at_stop(conn, num):
 def delete_table_trip(conn):
     try:
         cur = conn.cursor()
-        delete_table = """DROP TABLE trip""" #loltrip-esempio
+        delete_table = """DROP TABLE esempio""" #loltrip-esempio
         cur.execute(delete_table)
         conn.commit()
     except Error as e:
@@ -207,7 +207,7 @@ def get_info(conn):
         json.dump(info, save_file, indent = 2)
         save_file.close()
     except Error as e:
-        print('lol')
+        print(e)
 
 
 # Press the green button in the gutter to run the script.
@@ -224,11 +224,11 @@ if __name__ == '__main__':
     next_stop = stops[1]
     get_info(db_conn)
     while not end_trip:
-        #lolcoordinate = GPS.get_gps_position()
-        #lolprint(coordinate)
-        #lolcoordinate = coordinate.split(' ')
-        check_position(db_conn, 45.4951034481734, 12.2574814558827, 0.00005) #PER PROVE IN ASSENZA DI GPS
-        #lolcheck_position(db_conn, float(coordinate[0]), float(coordinate[1]), 0.00005)
+        coordinate = GPS.get_gps_position()
+        print(coordinate)
+        coordinate = coordinate.split(' ')
+        #check_position(db_conn, 45.4951034481734, 12.2574814558827, 0.00005) #PER PROVE IN ASSENZA DI GPS
+        check_position(db_conn, float(coordinate[0]), float(coordinate[1]), 0.00005)
         get_info(db_conn)
         
 
