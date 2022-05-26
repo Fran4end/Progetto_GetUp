@@ -4,6 +4,7 @@ import RPi.GPIO as GPIO
 
 import serial
 import time
+import json
 
 ser = serial.Serial('/dev/ttyUSB2',115200)
 ser.flushInput()
@@ -24,7 +25,7 @@ def send_at(command,back,timeout):
 		if back not in rec_buff.decode():
 			return 0
 		else:
-			cord = rec_buff.decode().replace(back, '').replace('OK', '').replace(' ','')
+			cord = rec_buff.decode().replace(back, '').replace('OK', '').replace(' ','')#.replace('\r\n','')
 			co=',,,,,,'
 			if ',,,,,,' not in cord:	
 				inputDegrees = int(cord[2:4]);
@@ -34,10 +35,9 @@ def send_at(command,back,timeout):
 				inputMinutes = float(cord[19:28]);
 				longitude = inputDegrees + (inputMinutes/60);
 				co = str(latitude) + ' ' + str(longitude)
-			return 1, co
-	else:
-		print('GPS is not ready')
-		return 0
+				return 1, co
+			else:
+				return 0
 
 def get_gps_position():
 	rec_null = True
@@ -49,7 +49,7 @@ def get_gps_position():
 		answer, cord = send_at('AT+CGPSINFO','+CGPSINFO: ',1)
 		if 1 == answer:
 			answer = 0
-			if ',,' or '\r\n' in cord:
+			if ',,' in cord:
 				print('GPS is not ready')
 				time.sleep(1)
 			else:
@@ -61,4 +61,8 @@ def get_gps_position():
 			return False
 		time.sleep(1.5)
 
+info = get_gps_position()
+file = open('info.json', 'w')
+json.dump(info, file)
+file.close()
 print(get_gps_position())
