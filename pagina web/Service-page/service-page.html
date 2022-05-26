@@ -31,8 +31,8 @@
         const map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/streets-v11',
-            center: [12.3, 45.5],
-            zoom: 11
+            center: [12.2, 45.5],
+            zoom: 12
         });
 
         const marker = new mapboxgl.Marker({
@@ -40,12 +40,11 @@
         });
 
         function animateMarker(timestamp) {
-            fetch("http://192.168.8.250:8081/position")
+            fetch("http://192.168.8.250:8069/position")
                 .then(Response => Response.json())
                 .then(data => {
-                    console.log(data);
-                    long = data.longitudine;
-                    lati = data.latitudine;
+                    long = String(data.longitudine).replace('"', '');
+                    lati = String(data.latitudine).replace('"', '');
                     marker.setLngLat([
                         long,
                         lati
