@@ -1,3 +1,4 @@
+from ast import Constant
 from distutils import file_util
 from importlib.metadata import files
 import time
@@ -29,13 +30,14 @@ def audio(nome, next):
         textToAudioIt('Fermata, ' )
         textToAudioEn('Stop, ' )
     ferm(nome)
+    Constant.FERMATA = 'sample3.mp3'
     pl.playsound('sample1.mp3')
-    pl.playsound('sample3.mp3')
+    pl.playsound(Constant.FERMATA)
     pl.playsound('sample2.mp3')
-    pl.playsound('sample3.mp3')
+    pl.playsound(Constant.FERMATA)
     os.remove('sample1.mp3')
     os.remove('sample2.mp3')
-    os.remove('sample3.mp3')
+    os.remove(Constant.FERMATA)
 
 
 audio(t, False)
