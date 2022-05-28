@@ -6,17 +6,21 @@ from gtts import gTTS
 import playsound as pl
 import os
 
-def textToAudioIt(str):
-    audio = gTTS(str, lang='it')
-    audio.save('./sample1.mp3')
+Constant.FERMATA = './sample3.mp3'
+Constant.IT = './sample1.mp3'
+Constant.EN = './sample2.mp3'
 
-def textToAudioEn(str):
+def text_to_audio_it(str):
+    audio = gTTS(str, lang='it')
+    audio.save(Constant.IT)
+
+def text_to_audio_en(str):
     audio = gTTS(str, lang='en')
-    audio.save('./sample2.mp3')
+    audio.save(Constant.EN)
 
 def ferm(str):
     audio = gTTS(str, lang='it')
-    audio.save('./sample3.mp3')
+    audio.save(Constant.FERMATA)
 
 
 t = 'Santa Lucia'
@@ -24,19 +28,19 @@ y = 'Bissuola Tevere'
 
 def audio(nome, next):
     if(next):
-        textToAudioIt('Prossima fermata, ')
-        textToAudioEn('next stop, ')        
+        text_to_audio_it('Prossima fermata, ')
+        text_to_audio_en('next stop, ')        
     else:
-        textToAudioIt('Fermata, ' )
-        textToAudioEn('Stop, ' )
+        text_to_audio_it('Fermata, ' )
+        text_to_audio_en('Stop, ' )
     ferm(nome)
-    Constant.FERMATA = 'sample3.mp3'
-    pl.playsound('sample1.mp3')
+
+    pl.playsound(Constant.IT)
     pl.playsound(Constant.FERMATA)
-    pl.playsound('sample2.mp3')
+    pl.playsound(Constant.EN)
     pl.playsound(Constant.FERMATA)
-    os.remove('sample1.mp3')
-    os.remove('sample2.mp3')
+    os.remove(Constant.IT)
+    os.remove(Constant.EN)
     os.remove(Constant.FERMATA)
 
 
