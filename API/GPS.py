@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
-import RPi.GPIO as GPIO
-
+from pickle import TRUE
 import serial
 import time
 import json
@@ -25,30 +24,26 @@ def send_at(command,back,timeout):
 		if back not in rec_buff.decode():
 			return 0
 		else:
-			cord = rec_buff.decode().replace(back, '').replace('OK', '').replace(' ','')#.replace('\r\n','')
-			co=',,,,,,'
-			if ',,,,,,' not in cord:	
-				inputDegrees = int(cord[2:4]);
-				inputMinutes = float(cord[4:13]);
-				latitude = inputDegrees + (inputMinutes/60);
-				inputDegrees = int(cord[16:19]);
-				inputMinutes = float(cord[19:28]);
-				longitude = inputDegrees + (inputMinutes/60);
+			cord = rec_buff.decode().replace(back, '').replace('OK', '').replace(' ','').replace('\r\n','')
+			#if ',,,,' not in cord:
+			try:
+				latitude = int(cord[2:4]) + ((float(cord[4:13]))/60);
+				longitude = int(cord[16:19]) + ((float(cord[19:28]))/60);
 				co = str(latitude) + ' ' + str(longitude)
 				return 1, co
-			else:
-				return 0
+			except ValueError:
+			#else:
+				return 1, ',,'
 
 def get_gps_position():
-	rec_null = True
 	answer = 0
-	rec_buff = ''
 	send_at('AT+CGPS=1,1','OK',1)
 	time.sleep(2)
-	while rec_null:
+
+	while TRUE:
 		answer, cord = send_at('AT+CGPSINFO','+CGPSINFO: ',1)
+		
 		if 1 == answer:
-			answer = 0
 			if ',,' in cord:
 				print('GPS is not ready')
 				time.sleep(1)
@@ -56,9 +51,9 @@ def get_gps_position():
 				return cord
 		else:
 			print('error %d'%answer)
-			rec_buff = ''
 			send_at('AT+CGPS=0','OK',1)
 			return False
+
 		time.sleep(1.5)
 
 info = get_gps_position()
