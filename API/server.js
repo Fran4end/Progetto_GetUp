@@ -18,7 +18,6 @@ app.listen(port, function(err){
 })
 
 app.get('/position', function(__req, res){
-	gps.stdout.on('data', (data) => {console.log(data)});
 	var latitudine = 45.5;
 	var longitudine = 12.3;
 	const data = fs.readFileSync('./info.json', 'utf8');

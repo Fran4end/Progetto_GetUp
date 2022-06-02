@@ -3,7 +3,6 @@ from distutils import file_util
 from importlib.metadata import files
 import time
 from gtts import gTTS
-#import playsound as pl
 import pygame
 import os
 
@@ -29,7 +28,6 @@ y = 'Bissuola Tevere'
 
 
 def play(nome):
-    #pygame.mixer.init()
     pygame.mixer.init()
     sound = pygame.mixer.music.load(nome)
     playing = pygame.mixer.music.play()

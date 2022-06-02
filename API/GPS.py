@@ -38,26 +38,25 @@ def send_at(command,back,timeout):
 def get_gps_position():
 	answer = 0
 	send_at('AT+CGPS=1,1','OK',1)
-	time.sleep(2)
+	time.sleep(0.5)
 
-	while TRUE:
-		answer, cord = send_at('AT+CGPSINFO','+CGPSINFO: ',1)
-		
-		if 1 == answer:
-			if ',,,,,,' in cord:
-				print('GPS is not ready')
-				time.sleep(1)
-			else:
-				return cord
+	answer, cord = send_at('AT+CGPSINFO','+CGPSINFO: ',1)
+	
+	if 1 == answer:
+		if ',,,,,,' in cord:
+			print('GPS is not ready')
+			time.sleep(1)
 		else:
-			print('error %d'%answer)
-			send_at('AT+CGPS=0','OK',1)
-			return False
+			return cord
+	else:
+		print('error %d'%answer)
+		send_at('AT+CGPS=0','OK',1)
+		return False
 
-		time.sleep(1.5)
+while True:
+    info = get_gps_position()
+    file = open('info.json', 'w')
+    json.dump(info, file)
+    file.close()
+    time.sleep(0.2)
 
-info = get_gps_position()
-file = open('info.json', 'w')
-json.dump(info, file)
-file.close()
-print(info)
