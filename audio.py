@@ -4,13 +4,12 @@ from importlib.metadata import files
 import time
 from gtts import gTTS
 #import playsound as pl
-import pygame as pl
+import pygame
 import os
 
-Constant.FERMATA = './sample3.mp3'
-Constant.IT = './sample1.mp3'
-Constant.EN = './sample2.mp3'
-pl.mixer.init()
+Constant.FERMATA = 'sample3.mp3'
+Constant.IT = 'sample1.mp3'
+Constant.EN = 'sample2.mp3'
 
 def text_to_audio_it(str):
     audio = gTTS(str, lang='it')
@@ -29,6 +28,15 @@ t = 'Santa Lucia'
 y = 'Bissuola Tevere'
 
 
+def play(nome):
+    #pygame.mixer.init()
+    pygame.mixer.init()
+    sound = pygame.mixer.music.load(nome)
+    playing = pygame.mixer.music.play()
+    while pygame.mixer.music.get_busy():
+        pygame.time.delay(100)
+
+
 def audio(nome, next):
     if(next):
         text_to_audio_it('Prossima fermata, ')
@@ -38,19 +46,18 @@ def audio(nome, next):
         text_to_audio_en('Stop, ' )
     ferm(nome)
 
-    pl.mixer.music.load(Constant.IT)
-    pl.mixer.music.play()
-    pl.mixer.music.load(Constant.FERMATA)
-    pl.mixer.music.play()
-    #play(Constant.EN)
-    #play(Constant.FERMATA)
+
+    play(Constant.IT)
+    play(Constant.FERMATA)
+    play(Constant.EN)
+    play(Constant.FERMATA)
     #pl.playsound(Constant.IT)
     #pl.playsound(Constant.FERMATA)
     #pl.playsound(Constant.EN)
     #pl.playsound(Constant.FERMATA)
-    os.remove(Constant.IT)
-    os.remove(Constant.EN)
-    os.remove(Constant.FERMATA)
+    #os.remove(Constant.IT)
+    #os.remove(Constant.EN)
+    #os.remove(Constant.FERMATA)
 
 
 audio(t, False)
