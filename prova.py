@@ -3,6 +3,7 @@ import time
 import cv2
 import numpy as np
 import cvlib as cv
+import os
 import matplotlib.pyplot as plt
 from cvlib.object_detection import draw_bbox
 
@@ -15,7 +16,7 @@ def take_photo(In):
     ret, frame = cap.read()
     (grabbed, frame) = cap.read()
     time.sleep(0.3)  # Wait 300 miliseconds
-    image = '.\capture' + str(In) + '.png'
+    image = 'capture' + str(In) + '.png'
     cv2.imwrite(image, frame)
     cap.release()
     return image
@@ -69,4 +70,7 @@ def count(path):
     # plt.show()
 
     per = math.floor(((Nperson + persone) / 2))
+    os.remove(path)
     return per
+
+print(count(take_photo(0)))
