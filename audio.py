@@ -46,22 +46,12 @@ def audio(nome, next):
         text_to_audio_en('Stop, ' )
     ferm(nome)
 
-
     play(Constant.IT)
     play(Constant.FERMATA)
     play(Constant.EN)
     play(Constant.FERMATA)
-    #pl.playsound(Constant.IT)
-    #pl.playsound(Constant.FERMATA)
-    #pl.playsound(Constant.EN)
-    #pl.playsound(Constant.FERMATA)
-    #os.remove(Constant.IT)
-    #os.remove(Constant.EN)
-    #os.remove(Constant.FERMATA)
 
 
 audio(t, False)
-
 time.sleep(2)
-
 audio(y, True)
