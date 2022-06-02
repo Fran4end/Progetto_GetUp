@@ -27,13 +27,13 @@ def send_at(command,back,timeout):
 			cord = rec_buff.decode().replace(back, '').replace('OK', '').replace(' ','').replace('\r\n','')
 			#if ',,,,' not in cord:
 			try:
-				latitude = int(cord[2:4]) + ((float(cord[4:13]))/60);
-				longitude = int(cord[16:19]) + ((float(cord[19:28]))/60);
+				latitude = int(cord[0:2]) + ((float(cord[2:11]))/60);
+				longitude = int(cord[14:17]) + ((float(cord[17:26]))/60);
 				co = str(latitude) + ' ' + str(longitude)
 				return 1, co
 			except ValueError:
 			#else:
-				return 1, ',,'
+				return 1, ',,,,,,'
 
 def get_gps_position():
 	answer = 0
@@ -44,7 +44,7 @@ def get_gps_position():
 		answer, cord = send_at('AT+CGPSINFO','+CGPSINFO: ',1)
 		
 		if 1 == answer:
-			if ',,' in cord:
+			if ',,,,,,' in cord:
 				print('GPS is not ready')
 				time.sleep(1)
 			else:
@@ -60,4 +60,4 @@ info = get_gps_position()
 file = open('info.json', 'w')
 json.dump(info, file)
 file.close()
-print(get_gps_position())
+print(info)

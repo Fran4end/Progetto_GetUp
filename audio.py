@@ -3,12 +3,14 @@ from distutils import file_util
 from importlib.metadata import files
 import time
 from gtts import gTTS
-import playsound as pl
+#import playsound as pl
+import pygame as pl
 import os
 
 Constant.FERMATA = './sample3.mp3'
 Constant.IT = './sample1.mp3'
 Constant.EN = './sample2.mp3'
+pl.mixer.init()
 
 def text_to_audio_it(str):
     audio = gTTS(str, lang='it')
@@ -26,6 +28,7 @@ def ferm(str):
 t = 'Santa Lucia'
 y = 'Bissuola Tevere'
 
+
 def audio(nome, next):
     if(next):
         text_to_audio_it('Prossima fermata, ')
@@ -35,10 +38,16 @@ def audio(nome, next):
         text_to_audio_en('Stop, ' )
     ferm(nome)
 
-    pl.playsound(Constant.IT)
-    pl.playsound(Constant.FERMATA)
-    pl.playsound(Constant.EN)
-    pl.playsound(Constant.FERMATA)
+    pl.mixer.music.load(Constant.IT)
+    pl.mixer.music.play()
+    pl.mixer.music.load(Constant.FERMATA)
+    pl.mixer.music.play()
+    #play(Constant.EN)
+    #play(Constant.FERMATA)
+    #pl.playsound(Constant.IT)
+    #pl.playsound(Constant.FERMATA)
+    #pl.playsound(Constant.EN)
+    #pl.playsound(Constant.FERMATA)
     os.remove(Constant.IT)
     os.remove(Constant.EN)
     os.remove(Constant.FERMATA)
