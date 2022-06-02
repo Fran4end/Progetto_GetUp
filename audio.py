@@ -48,6 +48,9 @@ def audio(nome, next):
     play(Constant.FERMATA)
     play(Constant.EN)
     play(Constant.FERMATA)
+    os.remove(Constant.IT)
+    os.remove(Constant.FERMATA)
+    os.remove(Constant.EN)
 
 
 audio(t, False)
