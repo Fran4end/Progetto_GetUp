@@ -1,5 +1,4 @@
 from ast import Constant
-from distutils import file_util
 from importlib.metadata import files
 import time
 from gtts import gTTS
@@ -29,8 +28,8 @@ y = 'Bissuola Tevere'
 
 def play(nome):
     pygame.mixer.init()
-    sound = pygame.mixer.music.load(nome)
-    playing = pygame.mixer.music.play()
+    pygame.mixer.music.load(nome)
+    pygame.mixer.music.play()
     while pygame.mixer.music.get_busy():
         pygame.time.delay(100)
 
